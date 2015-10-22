@@ -14,24 +14,38 @@ public class MyArrayAdapter extends ArrayAdapter<AppInfo> {
     private final Context context;
     private final List<AppInfo> appInfoList;
 
+    static class ViewHolder {
+        public TextView appName;
+        public TextView appPackageName;
+        public ImageView icon;
+    }
+
     public MyArrayAdapter(Context context, List<AppInfo> appInfoList) {
-        super(context, -1, appInfoList);
+        super(context, R.layout.rowlayout, appInfoList);
         this.context = context;
         this.appInfoList = appInfoList;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.rowlayout, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.app_name_label);
-        TextView textView2 = (TextView) rowView.findViewById(R.id.app_package_name_label);
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.app_icon);
+        View rowView = convertView;
+        // reuse views
+        if (rowView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            rowView = inflater.inflate(R.layout.rowlayout, parent, false);
+            // configure view holder
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.appName = (TextView) rowView.findViewById(R.id.app_name_label);
+            viewHolder.appPackageName = (TextView) rowView.findViewById(R.id.app_package_name_label);
+            viewHolder.icon = (ImageView) rowView.findViewById(R.id.app_icon);
+            rowView.setTag(viewHolder);
+        }
 
-        textView.setText(appInfoList.get(position).getAppName());
-        textView2.setText(appInfoList.get(position).getPackageName());
-        imageView.setImageDrawable(appInfoList.get(position).getIcon());
+        // fill data
+        ViewHolder holder = (ViewHolder) rowView.getTag();
+        holder.appName.setText(appInfoList.get(position).getAppName());
+        holder.appPackageName.setText(appInfoList.get(position).getPackageName());
+        holder.icon.setImageDrawable(appInfoList.get(position).getIcon());
 
         return rowView;
     }
